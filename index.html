@@ -1,0 +1,436 @@
+<!DOCTYPE HTML>
+<!--
+	Dimension by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>XTGIFTING</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<div class="logo">
+							<span class="icon fa-gem"></span>
+						</div>
+						<div class="content">
+							<div class="inner">
+								<h1>XTGIFTING</h1>
+								<p>Where you can send a voluntary, non-refundable gift <3 </p>
+								<p>Payment link is still under construction/not yet functional! Site is live for stripe review of intent and policies. </p>
+								<p>TESTING</p>
+
+<stripe-buy-button
+  buy-button-id="buy_btn_1Sm0kTBK0rDTzPbm3FzUhjAT"
+  publishable-key="pk_live_51Sl0u1BK0rDTzPbmW5PlJ32P45IJFsTyChuSpsjwoUF7PLnlhUSY2o6BqR8E5WB7gxG5FzLS3927y1JWvjOA1Mqb00ZQKhRiTx"
+>
+</stripe-buy-button>
+							</div>
+						</div>
+						<nav>
+							<ul>
+								<!--buttons on main page--> 
+								<li><button id="openGiftModal">Send a Gift</button></li>
+								<li><a href="#SpinWheel">Spin Wheel</a></li>
+								<!--<li><a href="#elements">Elements</a></li>-->
+							</ul>
+						</nav>
+					</header>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- Send Gift -->
+						<article id="SendGiftArticle">
+						<h2 class="major"></h2>
+						<p><br><br><br><br><br><br><br><br><br><br><br><br><br><br></p>
+
+						<div class="modal" id="giftModal">
+							<div class="modal-content">
+							<h3>Send a Gift</h3>
+							<form id="gift-form">
+								<label for="giftAmount">Amount (USD)</label>
+								<input type="number" id="giftAmount" min="1" step="1" placeholder="25" required />
+
+								<label for="giftName">Billing Name</label>
+								<input type="text" id="giftName" placeholder="Name on card" required />
+
+								<label for="giftEmail">Email</label>
+								<input type="email" id="giftEmail" placeholder="for receipt" required />
+
+								<label for="giftUsername">(Optional) Nickname</label>
+								<input type="text" id="giftUsername" maxlength="20" placeholder="Who is sending this gift?" />
+
+								<label>Card Information</label>
+								<div id="gift-card-element"></div>
+
+								<button type="submit">Send Gift</button>
+							</form>
+							<p id="gift-message"></p>
+							</div>
+						</div>
+						</article>
+
+
+						<!-- Gift Policy -->
+							<article id="GiftPolicy">
+								<h2 class="major">Gift Policy</h2>
+								<p>Sending a gift does not create any expectation of response, recognition, or future interaction.
+								All contributions made through this platform are voluntary gifts. Gifts do not entitle the sender to any goods, services, content, or personal interaction.</p><p>
+								Payments are processed immediately and are considered final. For this reason, all contributions are non-refundable. Refunds, chargebacks, and reversals are not supported except as required by law.</p><p>
+								Payments are processed securely by Stripe. The platform does not store or have access to full credit card payment details.</p><p>
+								Users may not use gifts in an attempt to demand goods, services, or obligations of any kind, nor engage in fraudulent, abusive, or unlawful behavior.</p><p>
+
+These Terms of Service may be updated at any time. Continued use of this platform constitutes acceptance of the updated terms.
+F								or questions regarding these terms, please email xtgifts@aol.com.</p>
+							</article>
+						<!-- Privacy Policy -->
+							<article id="PrivacyPolicy">
+								<h2 class="major">Privacy Policy</h2>
+								<p>By using this platform, you consent to the practices described below. </p> 
+								<p>Information Collected: The platform may collect limited information necessary to operate the site and process gifts, including:
+								Basic contact information (such as an email address, if voluntarily provided).
+								Technical information (such as IP address, browser type, and device information). Payment-related metadata generated during transactions. The platform does not sell personal data.</p>
+								<p>Payment Processing: All payments are processed securely by third-party payment processors, such as Stripe. The platform:Does not store full credit card numbers. Does not have access to complete payment card details. Relies on Stripe’s secure infrastructure to process transactions. Payment information is handled in accordance with Stripe’s privacy and security policies.</p>
+								<p>Use of Information: Information collected may be used to: Process gift contributions. Maintain site functionality and security. Respond to inquiries or support requests. Comply with legal or regulatory obligations. Information is not used for advertising or sold to third parties.</p>
+								<p>Data Sharing: Personal information is shared only as necessary to operate the platform, including with payment processors such as Stripe. Information may also be disclosed if required by law or legal process.</p>
+								<p>Data Security: Reasonable technical and administrative measures are used to protect information against unauthorized access, disclosure, or misuse. However, no method of transmission over the internet is completely secure.</p>
+								<p>Third-Party Services: This platform may contain links to third-party services or websites. This Privacy Policy does not apply to third-party sites, and users are encouraged to review their privacy practices separately.</p>
+								<p>Changes to this policy: This Privacy Policy may be updated at any time. Continued use of the platform constitutes acceptance of the updated policy. </p>
+								<p>Contact: For questions about this Privacy Policy or data practices, please contact xtgifts@aol.com </p>
+							</article>							
+
+
+						<!-- Wheel -->
+							<article id="SpinWheel">
+								<h2 class="major">Wheel Spin</h2>
+								<span class="image main"><img src="images/pic03.jpg" alt="" /></span>
+								<p> Can't decide on an amount? Spin the wheel for a suggested gift amount.</p>
+								<p>  Don't like the result? That's ok. You're always in charge of any actual gift amounts.</p>
+							</article>
+				
+
+						<!-- Elements -->
+							<article id="elements">
+								<h2 class="major">Elements</h2>
+
+								<section>
+									<h3 class="major">Text</h3>
+									<p>This is <b>bold</b> and this is <strong>strong</strong>. This is <i>italic</i> and this is <em>emphasized</em>.
+									This is <sup>superscript</sup> text and this is <sub>subscript</sub> text.
+									This is <u>underlined</u> and this is code: <code>for (;;) { ... }</code>. Finally, <a href="#">this is a link</a>.</p>
+									<hr />
+									<h2>Heading Level 2</h2>
+									<h3>Heading Level 3</h3>
+									<h4>Heading Level 4</h4>
+									<h5>Heading Level 5</h5>
+									<h6>Heading Level 6</h6>
+									<hr />
+									<h4>Blockquote</h4>
+									<blockquote>Fringilla nisl. Donec accumsan interdum nisi, quis tincidunt felis sagittis eget tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan faucibus. Vestibulum ante ipsum primis in faucibus lorem ipsum dolor sit amet nullam adipiscing eu felis.</blockquote>
+									<h4>Preformatted</h4>
+									<pre><code>i = 0;
+
+while (!deck.isInOrder()) {
+    print 'Iteration ' + i;
+    deck.shuffle();
+    i++;
+}
+
+print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
+								</section>
+
+								<section>
+									<h3 class="major">Lists</h3>
+
+									<h4>Unordered</h4>
+									<ul>
+										<li>Dolor pulvinar etiam.</li>
+										<li>Sagittis adipiscing.</li>
+										<li>Felis enim feugiat.</li>
+									</ul>
+
+									<h4>Alternate</h4>
+									<ul class="alt">
+										<li>Dolor pulvinar etiam.</li>
+										<li>Sagittis adipiscing.</li>
+										<li>Felis enim feugiat.</li>
+									</ul>
+
+									<h4>Ordered</h4>
+									<ol>
+										<li>Dolor pulvinar etiam.</li>
+										<li>Etiam vel felis viverra.</li>
+										<li>Felis enim feugiat.</li>
+										<li>Dolor pulvinar etiam.</li>
+										<li>Etiam vel felis lorem.</li>
+										<li>Felis enim et feugiat.</li>
+									</ol>
+									<h4>Icons</h4>
+									<ul class="icons">
+										<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+										<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+										<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+										<li><a href="#" class="icon brands fa-github"><span class="label">Github</span></a></li>
+									</ul>
+
+									<h4>Actions</h4>
+									<ul class="actions">
+										<li><a href="#" class="button primary">Default</a></li>
+										<li><a href="#" class="button">Default</a></li>
+									</ul>
+									<ul class="actions stacked">
+										<li><a href="#" class="button primary">Default</a></li>
+										<li><a href="#" class="button">Default</a></li>
+									</ul>
+								</section>
+
+								<section>
+									<h3 class="major">Table</h3>
+									<h4>Default</h4>
+									<div class="table-wrapper">
+										<table>
+											<thead>
+												<tr>
+													<th>Name</th>
+													<th>Description</th>
+													<th>Price</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<td>Item One</td>
+													<td>Ante turpis integer aliquet porttitor.</td>
+													<td>29.99</td>
+												</tr>
+												<tr>
+													<td>Item Two</td>
+													<td>Vis ac commodo adipiscing arcu aliquet.</td>
+													<td>19.99</td>
+												</tr>
+												<tr>
+													<td>Item Three</td>
+													<td> Morbi faucibus arcu accumsan lorem.</td>
+													<td>29.99</td>
+												</tr>
+												<tr>
+													<td>Item Four</td>
+													<td>Vitae integer tempus condimentum.</td>
+													<td>19.99</td>
+												</tr>
+												<tr>
+													<td>Item Five</td>
+													<td>Ante turpis integer aliquet porttitor.</td>
+													<td>29.99</td>
+												</tr>
+											</tbody>
+											<tfoot>
+												<tr>
+													<td colspan="2"></td>
+													<td>100.00</td>
+												</tr>
+											</tfoot>
+										</table>
+									</div>
+
+									<h4>Alternate</h4>
+									<div class="table-wrapper">
+										<table class="alt">
+											<thead>
+												<tr>
+													<th>Name</th>
+													<th>Description</th>
+													<th>Price</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<td>Item One</td>
+													<td>Ante turpis integer aliquet porttitor.</td>
+													<td>29.99</td>
+												</tr>
+												<tr>
+													<td>Item Two</td>
+													<td>Vis ac commodo adipiscing arcu aliquet.</td>
+													<td>19.99</td>
+												</tr>
+												<tr>
+													<td>Item Three</td>
+													<td> Morbi faucibus arcu accumsan lorem.</td>
+													<td>29.99</td>
+												</tr>
+												<tr>
+													<td>Item Four</td>
+													<td>Vitae integer tempus condimentum.</td>
+													<td>19.99</td>
+												</tr>
+												<tr>
+													<td>Item Five</td>
+													<td>Ante turpis integer aliquet porttitor.</td>
+													<td>29.99</td>
+												</tr>
+											</tbody>
+											<tfoot>
+												<tr>
+													<td colspan="2"></td>
+													<td>100.00</td>
+												</tr>
+											</tfoot>
+										</table>
+									</div>
+								</section>
+
+								<section>
+									<h3 class="major">Buttons</h3>
+									<ul class="actions">
+										<li><a href="#" class="button primary">Primary</a></li>
+										<li><a href="#" class="button">Default</a></li>
+									</ul>
+									<ul class="actions">
+										<li><a href="#" class="button">Default</a></li>
+										<li><a href="#" class="button small">Small</a></li>
+									</ul>
+									<ul class="actions">
+										<li><a href="#" class="button primary icon solid fa-download">Icon</a></li>
+										<li><a href="#" class="button icon solid fa-download">Icon</a></li>
+									</ul>
+									<ul class="actions">
+										<li><span class="button primary disabled">Disabled</span></li>
+										<li><span class="button disabled">Disabled</span></li>
+									</ul>
+								</section>
+
+								<section>
+									<h3 class="major">Form</h3>
+									<form method="post" action="#">
+										<div class="fields">
+											<div class="field half">
+												<label for="demo-name">Name</label>
+												<input type="text" name="demo-name" id="demo-name" value="" placeholder="Jane Doe" />
+											</div>
+											<div class="field half">
+												<label for="demo-email">Email</label>
+												<input type="email" name="demo-email" id="demo-email" value="" placeholder="jane@untitled.tld" />
+											</div>
+											<div class="field">
+												<label for="demo-category">Category</label>
+												<select name="demo-category" id="demo-category">
+													<option value="">-</option>
+													<option value="1">Manufacturing</option>
+													<option value="1">Shipping</option>
+													<option value="1">Administration</option>
+													<option value="1">Human Resources</option>
+												</select>
+											</div>
+											<div class="field half">
+												<input type="radio" id="demo-priority-low" name="demo-priority" checked>
+												<label for="demo-priority-low">Low</label>
+											</div>
+											<div class="field half">
+												<input type="radio" id="demo-priority-high" name="demo-priority">
+												<label for="demo-priority-high">High</label>
+											</div>
+											<div class="field half">
+												<input type="checkbox" id="demo-copy" name="demo-copy">
+												<label for="demo-copy">Email me a copy</label>
+											</div>
+											<div class="field half">
+												<input type="checkbox" id="demo-human" name="demo-human" checked>
+												<label for="demo-human">Not a robot</label>
+											</div>
+											<div class="field">
+												<label for="demo-message">Message</label>
+												<textarea name="demo-message" id="demo-message" placeholder="Enter your message" rows="6"></textarea>
+											</div>
+										</div>
+										<ul class="actions">
+											<li><input type="submit" value="Send Message" class="primary" /></li>
+											<li><input type="reset" value="Reset" /></li>
+										</ul>
+									</form>
+								</section>
+
+							</article>
+
+					</div>
+
+				<!-- Footer -->
+					<footer id="footer">
+						<p class="copyright">&copy; XTGIFTING <a href="#PrivacyPolicy">Privacy Policy</a> <a href="#GiftPolicy">Gift Policy</a></p>
+					</footer>
+
+			</div>
+
+		<!-- BG -->
+			<div id="bg"></div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+			<!--the below scripts were added to support stripe modal.-->
+			<script src="https://js.stripe.com/v3/"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  const openBtn = document.getElementById("openGiftModal");
+  const modal = document.getElementById("giftModal");
+  const form = document.getElementById("gift-form");
+
+  if (!openBtn || !modal || !form) {
+    console.error("Required elements missing:", { openBtn, modal, form });
+    return;
+  }
+
+  const stripe = Stripe("pk_live_51Sl0u1BK0rDTzPbmW5PlJ32P45IJFsTyChuSpsjwoUF7PLnlhUSY2o6BqR8E5WB7gxG5FzLS3927y1JWvjOA1Mqb00ZQKhRiTx");
+  let card;
+
+  function mountStripeCard() {
+    if (card) return;
+    const elements = stripe.elements();
+    card = elements.create("card", { style: { base:{color:"#333",fontSize:"16px"}, invalid:{color:"#e74c3c"} } });
+    card.mount("#gift-card-element");
+  }
+
+  openBtn.addEventListener("click", () => {
+    modal.style.display = "flex";
+    mountStripeCard();
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const amount = Number(document.getElementById("giftAmount").value);
+    const email = document.getElementById("giftEmail").value;
+    const name = document.getElementById("giftName").value;
+    const username = document.getElementById("giftUsername").value;
+
+    const res = await fetch("/create-payment-intent", {
+      method:"POST",
+      headers: { "Content-Type":"application/json" },
+      body: JSON.stringify({ amount: Math.round(amount*100), metadata:{username} })
+    });
+    const { clientSecret } = await res.json();
+    const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: { card, billing_details:{ email, name } }
+    });
+    const msg = document.getElementById("gift-message");
+    msg.textContent = error ? error.message : "Thank you — your gift was received 💝";
+    msg.style.color = error ? "red" : "green";
+  });
+});
+</script>
+
+	</body>
+</html>
