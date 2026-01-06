@@ -22,19 +22,23 @@ app.post("/create-checkout-session", async (req, res) => {
     const unitAmount = Math.round(amt * 100); // cents
 
     const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      ui_mode: "embedded",
+  mode: "payment",
+  ui_mode: "embedded",
 
-      line_items: [
-        {
-          price_data: {
-            currency: "usd",
-            product_data: { name: "Voluntary Gift" },
-            unit_amount: unitAmount,
-          },
-          quantity: 1,
-        },
-      ],
+  line_items: [
+    {
+      price_data: {
+        currency: "usd",
+        product_data: { name: "Voluntary Gift" },
+        unit_amount: Math.round(amt * 100),
+      },
+      quantity: 1,
+    },
+  ],
+
+  return_url: "http://127.0.0.1:3000/index.html?session_id={CHECKOUT_SESSION_ID}",
+});
+
 
       // ✅ IMPORTANT: return_url must be your FRONTEND URL (not the backend port)
       // Use whatever URL your site is actually running at (Live Server / Vercel domain).
