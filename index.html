@@ -51,32 +51,7 @@
 						<!-- Send Gift -->
 						<article id="SendGiftArticle">
 						<h2 class="major"></h2>
-						<p><br><br><br><br><br><br><br><br><br><br><br><br><br><br></p>
-
-						<div class="modal" id="giftModal">
-							<div class="modal-content">
-							<h3>Send a Gift</h3>
-							<form id="gift-form">
-								<label for="giftAmount">Amount (USD)</label>
-								<input type="number" id="giftAmount" min="1" step="1" placeholder="25" required />
-
-								<label for="giftName">Billing Name</label>
-								<input type="text" id="giftName" placeholder="Name on card" required />
-
-								<label for="giftEmail">Email</label>
-								<input type="email" id="giftEmail" placeholder="for receipt" required />
-
-								<label for="giftUsername">(Optional) Nickname</label>
-								<input type="text" id="giftUsername" maxlength="20" placeholder="Who is sending this gift?" />
-
-								<label>Card Information</label>
-								<div id="gift-card-element"></div>
-
-								<button type="submit">Send Gift</button>
-							</form>
-							<p id="gift-message"></p>
-							</div>
-						</div>
+						
 						</article>
 
 
@@ -372,64 +347,277 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 		<!-- BG -->
 			<div id="bg"></div>
 
+			<!--Stripe modal-->
+			<div class="modal" id="checkoutModal" style="display:none;">
+		<div class="modal-content checkout-modal-content">
+			<h3>Send a Gift</h3>
+
+			<label for="giftAmount">Amount (USD)</label>
+			<input
+			type="number"
+			id="giftAmount"
+			min="1"
+			step="1"
+			value="25"
+			required
+			/>
+
+			<button id="startCheckout" type="button">Continue</button>
+
+			<div id="embedded-checkout"></div>
+
+			<p id="checkoutError"></p>
+		</div>
+		</div>
+
 		<!-- Scripts -->
 			<script src="assets/js/jquery.min.js"></script>
 			<script src="assets/js/browser.min.js"></script>
 			<script src="assets/js/breakpoints.min.js"></script>
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
-
-			<!--the below scripts were added to support stripe modal.-->
+			
 			<script src="https://js.stripe.com/v3/"></script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-  const openBtn = document.getElementById("openGiftModal");
-  const modal = document.getElementById("giftModal");
-  const form = document.getElementById("gift-form");
+  // ✅ Replace with your publishable key (pk_test_... for testing)
+  const stripe = Stripe("pk_live_51Sl0u1BK0rDTzPbmW5PlJ32P45IJFsTyChuSpsjwoUF7PLnlhUSY2o6BqR8E5WB7gxG5FzLS3927y1JWvjOA1Mqb00ZQKhRiTx");
 
-  if (!openBtn || !modal || !form) {
-    console.error("Required elements missing:", { openBtn, modal, form });
+  const modal = document.getElementById("checkoutModal");
+  const startBtn = document.getElementById("startCheckout");
+  const errorEl = document.getElementById("checkoutError");
+  const mountPoint = document.getElementById("embedded-checkout");
+  const amountInput = document.getElementById("giftAmount");
+
+  if (!modal || !startBtn || !errorEl || !mountPoint || !amountInput) {
+    console.error("Checkout modal elements missing.", { modal, startBtn, errorEl, mountPoint, amountInput });
     return;
   }
 
-  const stripe = Stripe("pk_live_51Sl0u1BK0rDTzPbmW5PlJ32P45IJFsTyChuSpsjwoUF7PLnlhUSY2o6BqR8E5WB7gxG5FzLS3927y1JWvjOA1Mqb00ZQKhRiTx");
-  let card;
+  let checkoutInstance = null;
 
-  function mountStripeCard() {
-    if (card) return;
-    const elements = stripe.elements();
-    card = elements.create("card", { style: { base:{color:"#333",fontSize:"16px"}, invalid:{color:"#e74c3c"} } });
-    card.mount("#gift-card-element");
+  function cleanupEmbeddedCheckout() {
+    if (checkoutInstance) {
+      try {
+        // Stripe embeds sometimes provide destroy(), sometimes unmount()
+        if (typeof checkoutInstance.destroy === "function") checkoutInstance.destroy();
+        else if (typeof checkoutInstance.unmount === "function") checkoutInstance.unmount();
+      } catch (e) {
+        console.warn("Checkout cleanup error:", e);
+      }
+      checkoutInstance = null;
+    }
+    mountPoint.innerHTML = "";
   }
 
-  openBtn.addEventListener("click", () => {
+  function openModal() {
+    // ✅ hides Dimension article “box” via CSS (see main.css section below)
+    document.body.classList.add("modal-open");
     modal.style.display = "flex";
-    mountStripeCard();
+  }
+
+  function closeModal({ clearHash = false } = {}) {
+    cleanupEmbeddedCheckout();
+    errorEl.textContent = "";
+
+    modal.style.display = "none";
+    document.body.classList.remove("modal-open");
+
+    // ✅ prevent SpinWheel from “re-triggering” gift state
+    if (clearHash) {
+      history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
+  }
+
+  // ✅ Key: only open modal on #SendGiftArticle, close it on ANY other hash (like #SpinWheel)
+  function handleHashChange() {
+    if (location.hash === "#SendGiftArticle") {
+      openModal();
+    } else {
+      closeModal({ clearHash: false });
+    }
+  }
+
+  window.addEventListener("hashchange", handleHashChange);
+  handleHashChange(); // handle direct load/refresh
+
+  // ✅ close if user clicks outside the modal content (overlay click)
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      closeModal({ clearHash: true });
+    }
   });
 
-  form.addEventListener("submit", async (e) => {
+  // ✅ Continue → create session → mount embedded checkout
+  startBtn.addEventListener("click", async (e) => {
     e.preventDefault();
-    const amount = Number(document.getElementById("giftAmount").value);
-    const email = document.getElementById("giftEmail").value;
-    const name = document.getElementById("giftName").value;
-    const username = document.getElementById("giftUsername").value;
+    e.stopPropagation();
 
-    const res = await fetch("/create-payment-intent", {
-      method:"POST",
-      headers: { "Content-Type":"application/json" },
-      body: JSON.stringify({ amount: Math.round(amount*100), metadata:{username} })
-    });
-    const { clientSecret } = await res.json();
-    const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-      payment_method: { card, billing_details:{ email, name } }
-    });
-    const msg = document.getElementById("gift-message");
-    msg.textContent = error ? error.message : "Thank you — your gift was received 💝";
-    msg.style.color = error ? "red" : "green";
+    errorEl.textContent = "";
+    cleanupEmbeddedCheckout();
+
+    const amount = Number(amountInput.value);
+    if (!amount || amount < 1) {
+      errorEl.textContent = "Please enter a valid amount.";
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:4242/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        errorEl.textContent = data.error || "Checkout session failed.";
+        return;
+      }
+
+      checkoutInstance = await stripe.initEmbeddedCheckout({
+        clientSecret: data.clientSecret
+      });
+
+      checkoutInstance.mount("#embedded-checkout");
+
+    } catch (err) {
+      // show real error message so debugging is accurate
+      errorEl.textContent = err?.message || "Something went wrong starting checkout.";
+      console.error(err);
+    }
   });
+
 });
 </script>
+
+			<!-- Stripe Embedded "pop up" Checkout Modal -->
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  // ✅ LIVE publishable key (OK to be public)
+  const stripe = Stripe("pk_live_51Sl0u1BK0rDTzPbmW5PlJ32P45IJFsTyChuSpsjwoUF7PLnlhUSY2o6BqR8E5WB7gxG5FzLS3927y1JWvjOA1Mqb00ZQKhRiTx");
+
+  // Main header button
+  const openBtn = document.getElementById("openGiftModal");
+
+  // Stripe Embedded Checkout modal elements
+  const modal = document.getElementById("checkoutModal");
+  const startBtn = document.getElementById("startCheckout");
+  const errorEl = document.getElementById("checkoutError");
+  const mountPoint = document.getElementById("embedded-checkout");
+  const amountInput = document.getElementById("giftAmount");
+
+  if (!openBtn || !modal || !startBtn || !errorEl || !mountPoint || !amountInput) {
+    console.error("Checkout modal elements missing.", { openBtn, modal, startBtn, errorEl, mountPoint, amountInput });
+    return;
+  }
+
+  let checkoutInstance = null;
+
+  function cleanupEmbeddedCheckout() {
+    if (checkoutInstance) {
+      try {
+        if (typeof checkoutInstance.destroy === "function") checkoutInstance.destroy();
+        else if (typeof checkoutInstance.unmount === "function") checkoutInstance.unmount();
+      } catch (e) {
+        console.warn("Checkout cleanup error:", e);
+      }
+      checkoutInstance = null;
+    }
+    mountPoint.innerHTML = "";
+  }
+
+  function openModal() {
+    document.body.classList.add("modal-open");
+    modal.style.display = "flex";
+  }
+
+  function closeModal({ clearHash = false } = {}) {
+    cleanupEmbeddedCheckout();
+    errorEl.textContent = "";
+    modal.style.display = "none";
+    document.body.classList.remove("modal-open");
+
+    // Clear hash so Dimension doesn't keep an article state around
+    if (clearHash) {
+      history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
+  }
+
+  // ✅ Open modal when clicking the header button
+  openBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    openModal();
+  });
+
+  // ✅ If you navigate to #SendGiftArticle via hash, also open
+  function handleHashChange() {
+    if (location.hash === "#SendGiftArticle") {
+      openModal();
+    } else {
+      // close if user navigates somewhere else (e.g., #SpinWheel)
+      closeModal({ clearHash: false });
+    }
+  }
+
+  window.addEventListener("hashchange", handleHashChange);
+
+  // ✅ Close when clicking overlay background
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      closeModal({ clearHash: true });
+    }
+  });
+
+  // ✅ Continue → create session → mount embedded checkout
+  startBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    errorEl.textContent = "";
+    cleanupEmbeddedCheckout();
+
+    const amount = Number(amountInput.value);
+    if (!amount || amount < 1) {
+      errorEl.textContent = "Please enter a valid amount.";
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:4242/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        errorEl.textContent = data.error || "Checkout session failed.";
+        return;
+      }
+
+      checkoutInstance = await stripe.initEmbeddedCheckout({
+        clientSecret: data.clientSecret
+      });
+
+      checkoutInstance.mount("#embedded-checkout");
+
+    } catch (err) {
+      errorEl.textContent = err?.message || "Something went wrong starting checkout.";
+      console.error(err);
+    }
+  });
+
+});
+</script>
+
+
+
 
 	</body>
 </html>

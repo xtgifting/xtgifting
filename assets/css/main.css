@@ -1680,3 +1680,104 @@ input, select, textarea {
   width: 90%;
   border-radius: 6px;
 }
+/* =========================
+   Stripe Modal + Dimension Fixes
+   ========================= */
+
+/* 1) Modal overlay */
+#checkoutModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(0,0,0,0.75);
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+/* 2) Modal content (dark themed) */
+#checkoutModal .checkout-modal-content {
+  background: #1f1f1f;
+  color: #f2f2f2;
+  width: min(560px, 100%);
+  border-radius: 12px;
+  padding: 20px;
+  box-sizing: border-box;
+
+  /* keep it from getting too tall */
+  max-height: 85vh;
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* Typography */
+#checkoutModal .checkout-modal-content h3 {
+  color: #ffffff;
+  margin: 0 0 10px 0;
+}
+
+#checkoutModal .checkout-modal-content label {
+  display: block;
+  margin: 10px 0 6px;
+  color: #d8d8d8;
+}
+
+/* Inputs */
+#checkoutModal .checkout-modal-content input[type="number"] {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background: #2a2a2a;
+  color: #fff;
+  box-sizing: border-box;
+}
+
+#checkoutModal .checkout-modal-content input::placeholder {
+  color: #aaa;
+}
+
+/* Continue button */
+#checkoutModal .checkout-modal-content button {
+  margin-top: 12px;
+  width: 100%;
+  padding: 11px 12px;
+  border-radius: 10px;
+  border: 1px solid #555;
+  background: #333;
+  color: #fff;
+  cursor: pointer;
+}
+
+#checkoutModal .checkout-modal-content button:hover {
+  background: #444;
+}
+
+/* Error message */
+#checkoutError {
+  margin-top: 10px;
+  color: #ff6b6b;
+}
+
+/* 3) Stripe embedded checkout area scrolls internally */
+#embedded-checkout {
+  margin-top: 14px;
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 4px;
+  min-height: 220px;
+}
+
+/* 4) Hide Dimension’s article "box" while modal is open */
+body.modal-open #main article {
+  display: none !important;
+}
+
+/* Prevent header dimming/filters while modal is open */
+body.modal-open #header {
+  opacity: 1 !important;
+  filter: none !important;
+}
