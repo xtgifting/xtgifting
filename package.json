@@ -1,12 +1,12 @@
 {
   "name": "xtgifting",
-  "version": "1.0.0",
   "private": true,
+  "version": "1.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
-    "stripe": "^20.1.0",
-    "cors": "^2.8.5",
-    "dotenv": "^17.2.3",
-    "express": "^5.2.1"
+    "stripe": "^16.0.0"
   }
 }

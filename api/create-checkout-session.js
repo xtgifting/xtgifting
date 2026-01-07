@@ -1,6 +1,8 @@
-const Stripe = require("stripe");
+import Stripe from "stripe";
 
-module.exports = async (req, res) => {
+export const config = { runtime: "nodejs" };
+
+export default async function handler(req, res) {
   try {
     if (req.method !== "POST") {
       return res.status(405).json({ error: "Method not allowed" });
@@ -28,21 +30,17 @@ module.exports = async (req, res) => {
           price_data: {
             currency: "usd",
             product_data: { name: "Voluntary Gift" },
-            unit_amount: Math.round(dollars * 100),
+            unit_amount: Math.round(dollars * 100)
           },
-          quantity: 1,
-        },
+          quantity: 1
+        }
       ],
-      return_url: `${req.headers.origin}/?session_id={CHECKOUT_SESSION_ID}`,
+      return_url: `${req.headers.origin}/?session_id={CHECKOUT_SESSION_ID}`
     });
 
     return res.status(200).json({ clientSecret: session.client_secret });
   } catch (err) {
     console.error("create-checkout-session error:", err);
-    return res.status(500).json({
-      error: err?.message || "Server error",
-      type: err?.type,
-      code: err?.code,
-    });
+    return res.status(500).json({ error: err?.message || "Server error" });
   }
-};
+}
