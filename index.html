@@ -477,41 +477,59 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 				}
 
 				let res;
-					try {
-					res = await fetch("/api/create-checkout-session", {
-						method: "POST",
-						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({ amount })
-					});
-					} catch (err) {
-					errorEl.textContent = "Unable to start checkout. Please try again.";
-					console.error("FETCH FAILED:", err);
-					return;
-					}
+			let rawText = "";
 
-				let data;
-				try {
-				data = await res.json();
-				} catch (err) {
-				errorEl.textContent = "Backend returned invalid JSON.";
-				console.error("BAD JSON:", err);
-				return;
-				}
-
-				if (!res.ok || data.error) {
-				errorEl.textContent = data.error || `Checkout session failed (HTTP ${res.status}).`;
-				return;
-				}
-
-				try {
-				checkoutInstance = await stripe.initEmbeddedCheckout({ clientSecret: data.clientSecret });
-				checkoutInstance.mount("#embedded-checkout");
-				} catch (err) {
-				errorEl.textContent = err?.message || "Stripe could not initialize Embedded Checkout.";
-				console.error("STRIPE INIT ERROR:", err);
-				}
+			try {
+			res = await fetch("/api/create-checkout-session", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ amount })
 			});
+			} catch (err) {
+			errorEl.textContent = "Network error calling /api/create-checkout-session.";
+			console.error("FETCH FAILED:", err);
+			return;
+			}
+
+			// Read as text first so we can debug non-JSON responses
+			try {
+			rawText = await res.text();
+			} catch (err) {
+			errorEl.textContent = "Could not read response from backend.";
+			console.error("READ FAILED:", err);
+			return;
+			}
+
+			// Try parsing JSON
+			let data;
+			try {
+			data = rawText ? JSON.parse(rawText) : null;
+			} catch (err) {
+			errorEl.textContent = "Backend returned invalid JSON. Check Vercel logs.";
+			console.error("INVALID JSON RESPONSE:", rawText);
+			return;
+			}
+
+			// Handle HTTP errors with real backend message
+			if (!res.ok) {
+			errorEl.textContent = data?.error || `Backend error (${res.status}).`;
+			console.error("BACKEND ERROR:", data);
+			return;
+			}
+
+			// Expect clientSecret
+			if (!data?.clientSecret) {
+			errorEl.textContent = "Backend did not return clientSecret.";
+			console.error("MISSING clientSecret:", data);
+			return;
+			}
+
+			// Continue: init embedded checkout
+			checkoutInstance = await stripe.initEmbeddedCheckout({
+			clientSecret: data.clientSecret
 			});
+			checkoutInstance.mount("#embedded-checkout");
+
 			</script>
 
 	</body>
