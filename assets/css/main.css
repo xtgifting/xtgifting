@@ -1736,6 +1736,16 @@ input, select, textarea {
   box-sizing: border-box;
 }
 
+#checkoutModal .checkout-modal-content input[type="char"] {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background: #2a2a2a;
+  color: #fff;
+  box-sizing: border-box;
+}
+
 #checkoutModal .checkout-modal-content input::placeholder {
   color: #aaa;
 }
