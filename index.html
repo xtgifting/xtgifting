@@ -362,6 +362,14 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 			required
 			/>
 
+			<label for="Username">Username (optional)</label>
+			<input
+			type="char"
+			id="Username"
+			maxlength="20"
+			step="1"
+			/>
+
 			<button id="startCheckout" type="button">Continue</button>
 
 			<div id="embedded-checkout"></div>
@@ -474,7 +482,7 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 				cleanupEmbeddedCheckout();
 
 				const amount = Number(amountInput.value);
-				if (!amount || amount < 1) {
+				if (!amount || amount < 5) {
 				errorEl.textContent = "Please enter a valid amount.";
 				return;
 				}
