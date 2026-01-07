@@ -1,16 +1,11 @@
 {
-  "name": "server",
+  "name": "xtgifting",
   "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
@@ -18,14 +13,3 @@
     "stripe": "^20.1.0"
   }
 }
-
-// adding for vercel backend sever for stripe checkout
-{
-  "name": "xtgifting",
-  "private": true,
-  "type": "module",
-  "dependencies": {
-    "stripe": "^16.0.0"
-  }
-}
-
