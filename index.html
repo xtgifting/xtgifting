@@ -378,18 +378,14 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 			<script src="assets/js/main.js"></script>
 		
 			<!-- Stripe Embedded "pop up" Checkout Modal -->
-			<!-- Stripe.js (LOAD ONCE) -->
 			<script src="https://js.stripe.com/v3/"></script>
-
 			<script>
 			document.addEventListener("DOMContentLoaded", () => {
 			// =========================
 			// CONFIG
 			// =========================
-			// IMPORTANT: Local dev over HTTP should use TEST keys.
-			// Live keys often won't render correctly on http://127.0.0.1
-			const stripe = Stripe("pk_live_51Sl0u1BK0rDTzPbmW5PlJ32P45IJFsTyChuSpsjwoUF7PLnlhUSY2o6BqR8E5WB7gxG5FzLS3927y1JWvjOA1Mqb00ZQKhRiTx");
-			const API_BASE = "http://localhost:4242";
+			// OK to use pk_live on your live domain (HTTPS). Use pk_test on local dev.
+			const stripe = Stripe("pk_live_51Sl0u1BK0rDTzPbmW5PlJ32P45IJFsTyChuSpsjwoUF7PLnlhUSY2o6BqR8E5WB7gxG5FzLS3927y1JWvjOA1Mqb00ZQKhRiTx"); // <-- keep your real key
 
 			// =========================
 			// ELEMENTS
@@ -425,7 +421,7 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 			}
 
 			function openModal() {
-				document.body.classList.add("modal-open");
+				document.body.classList.add("modal-open"); // your CSS hides Dimension panel
 				modal.style.display = "flex";
 			}
 
@@ -436,32 +432,39 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 				document.body.classList.remove("modal-open");
 
 				if (clearHash) {
+				// Remove hash so Dimension doesn't keep any "article state"
 				history.replaceState(null, "", window.location.pathname + window.location.search);
 				}
 			}
 
 			// =========================
-			// OPEN MODAL
+			// OPEN / CLOSE MODAL
 			// =========================
+			// Open via header button
 			openBtn.addEventListener("click", (e) => {
 				e.preventDefault();
 				openModal();
 			});
 
-			// Also open if you navigate to the article hash (Dimension)
+			// Open when navigating to #SendGiftArticle, close for any other hash (SpinWheel etc.)
 			function handleHashChange() {
-				if (location.hash === "#SendGiftArticle") openModal();
-				else closeModal({ clearHash: false });
+				if (location.hash === "#SendGiftArticle") {
+				openModal();
+				} else {
+				closeModal({ clearHash: false });
+				}
 			}
-			window.addEventListener("hashchange", handleHashChange);
 
-			// Close when clicking outside modal content
+			window.addEventListener("hashchange", handleHashChange);
+			handleHashChange(); // handle direct load/refresh
+
+			// Close when clicking the overlay background
 			modal.addEventListener("click", (e) => {
 				if (e.target === modal) closeModal({ clearHash: true });
 			});
 
 			// =========================
-			// START CHECKOUT (ONLY ONE HANDLER)
+			// START CHECKOUT (ONE HANDLER)
 			// =========================
 			startBtn.addEventListener("click", async (e) => {
 				e.preventDefault();
@@ -477,60 +480,68 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 				}
 
 				let res;
-			let rawText = "";
+				let rawText = "";
 
-			try {
-			res = await fetch("/api/create-checkout-session", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ amount })
+				try {
+				res = await fetch("/api/create-checkout-session", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ amount })
+				});
+				} catch (err) {
+				errorEl.textContent = "Network error calling backend.";
+				console.error("FETCH FAILED:", err);
+				return;
+				}
+
+				// Read as text first so we can debug non-JSON responses
+				try {
+				rawText = await res.text();
+				} catch (err) {
+				errorEl.textContent = "Could not read response from backend.";
+				console.error("READ FAILED:", err);
+				return;
+				}
+
+				// Try parsing JSON
+				let data;
+				try {
+				data = rawText ? JSON.parse(rawText) : null;
+				} catch (err) {
+				errorEl.textContent = "Backend returned invalid JSON. Check Vercel logs.";
+				console.error("INVALID JSON RESPONSE:", rawText);
+				return;
+				}
+
+				// Handle HTTP errors with real backend message
+				if (!res.ok) {
+				errorEl.textContent = data?.error || `Backend error (${res.status}).`;
+				console.error("BACKEND ERROR:", data);
+				return;
+				}
+
+				// Expect clientSecret
+				if (!data?.clientSecret) {
+				errorEl.textContent = "Backend did not return clientSecret.";
+				console.error("MISSING clientSecret:", data);
+				return;
+				}
+
+				// Mount Embedded Checkout
+				try {
+				checkoutInstance = await stripe.initEmbeddedCheckout({
+					clientSecret: data.clientSecret
+				});
+
+				checkoutInstance.mount("#embedded-checkout");
+				} catch (err) {
+				errorEl.textContent = "Stripe failed to initialize Embedded Checkout.";
+				console.error("STRIPE INIT FAILED:", err);
+				}
 			});
-			} catch (err) {
-			errorEl.textContent = "Network error calling /api/create-checkout-session.";
-			console.error("FETCH FAILED:", err);
-			return;
-			}
-
-			// Read as text first so we can debug non-JSON responses
-			try {
-			rawText = await res.text();
-			} catch (err) {
-			errorEl.textContent = "Could not read response from backend.";
-			console.error("READ FAILED:", err);
-			return;
-			}
-
-			// Try parsing JSON
-			let data;
-			try {
-			data = rawText ? JSON.parse(rawText) : null;
-			} catch (err) {
-			errorEl.textContent = "Backend returned invalid JSON. Check Vercel logs.";
-			console.error("INVALID JSON RESPONSE:", rawText);
-			return;
-			}
-
-			// Handle HTTP errors with real backend message
-			if (!res.ok) {
-			errorEl.textContent = data?.error || `Backend error (${res.status}).`;
-			console.error("BACKEND ERROR:", data);
-			return;
-			}
-
-			// Expect clientSecret
-			if (!data?.clientSecret) {
-			errorEl.textContent = "Backend did not return clientSecret.";
-			console.error("MISSING clientSecret:", data);
-			return;
-			}
-
-			// Continue: init embedded checkout
-			checkoutInstance = await stripe.initEmbeddedCheckout({
-			clientSecret: data.clientSecret
 			});
-			checkoutInstance.mount("#embedded-checkout");
-
 			</script>
+
 
 	</body>
 </html>
