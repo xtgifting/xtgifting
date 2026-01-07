@@ -482,8 +482,8 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 				cleanupEmbeddedCheckout();
 
 				const amount = Number(amountInput.value);
-				if (!amount || amount < 5) {
-				errorEl.textContent = "Please enter a valid amount.";
+				if (!amount || amount < 1) {
+				errorEl.textContent = "Gifts lower than $5 cannot be processed";
 				return;
 				}
 
