@@ -18,3 +18,14 @@
     "stripe": "^20.1.0"
   }
 }
+
+// adding for vercel backend sever for stripe checkout
+{
+  "name": "xtgifting",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "stripe": "^16.0.0"
+  }
+}
+
