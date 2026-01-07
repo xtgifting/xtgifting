@@ -1,18 +1,30 @@
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+export const config = {
+  runtime: "nodejs"
+};
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
   try {
-    const { amount } = req.body;
+    if (req.method !== "POST") {
+      return res.status(405).json({ error: "Method not allowed" });
+    }
 
-    if (!amount || Number(amount) < 1) {
+    // If your frontend sends { amount }, it should be dollars (e.g., 25)
+    const { amount } = req.body || {};
+    const dollars = Number(amount);
+
+    if (!dollars || dollars < 1) {
       return res.status(400).json({ error: "Invalid amount" });
     }
+
+    // IMPORTANT: do NOT use dotenv here — Vercel provides env vars
+    const secret = process.env.STRIPE_SECRET_KEY;
+    if (!secret) {
+      return res.status(500).json({ error: "Missing STRIPE_SECRET_KEY in Vercel env vars" });
+    }
+
+    const stripe = new Stripe(secret);
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
@@ -22,16 +34,18 @@ export default async function handler(req, res) {
           price_data: {
             currency: "usd",
             product_data: { name: "Voluntary Gift" },
-            unit_amount: Math.round(Number(amount) * 100),
+            unit_amount: Math.round(dollars * 100)
           },
-          quantity: 1,
-        },
+          quantity: 1
+        }
       ],
-      return_url: `https://${process.env.DOMAIN}/?session_id={CHECKOUT_SESSION_ID}`,
+      // Works on your custom domain + preview domains
+      return_url: `${req.headers.origin}/?session_id={CHECKOUT_SESSION_ID}`
     });
 
     return res.status(200).json({ clientSecret: session.client_secret });
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    console.error("create-checkout-session error:", err);
+    return res.status(500).json({ error: err?.message || "Server error" });
   }
 }
