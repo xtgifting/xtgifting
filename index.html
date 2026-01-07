@@ -477,17 +477,17 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 				}
 
 				let res;
-				try {
-				res = await fetch(`${API_BASE}/create-checkout-session`, {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ amount })
-				});
-				} catch (err) {
-				errorEl.textContent = "Cannot reach backend (http://localhost:4242). Is Server running?";
-				console.error("FETCH FAILED:", err);
-				return;
-				}
+					try {
+					res = await fetch("/api/create-checkout-session", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({ amount })
+					});
+					} catch (err) {
+					errorEl.textContent = "Unable to start checkout. Please try again.";
+					console.error("FETCH FAILED:", err);
+					return;
+					}
 
 				let data;
 				try {
