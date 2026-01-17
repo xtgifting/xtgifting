@@ -1970,3 +1970,11 @@ body.modal-open #header {
   color: var(--cos-muted);
   line-height: 1.5;
 }
+/* Force dark background for Cosmos article */
+#AskCosmos {
+  background: transparent;
+}
+
+#AskCosmos .cosmos {
+  color: rgba(255,255,255,0.92);
+}
