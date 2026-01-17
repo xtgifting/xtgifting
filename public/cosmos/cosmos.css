@@ -1,0 +1,178 @@
+/* =========================
+   ASK THE COSMOS — DARK UI
+   ========================= */
+
+/* Container */
+.cosmos {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  color: #f2f2f7;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* Headings */
+.cosmos-title {
+  margin: 0 0 8px;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+}
+
+.cosmos-sub {
+  margin: 0 0 18px;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+/* Card */
+.cosmos-card {
+  background: linear-gradient(
+    180deg,
+    rgba(24, 24, 30, 0.96),
+    rgba(16, 16, 22, 0.96)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 1px rgba(255,255,255,0.02);
+}
+
+/* Rows */
+.cosmos-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 14px 0;
+}
+
+/* Labels */
+.cosmos-label {
+  font-size: 12px;
+  letter-spacing: 0.3px;
+  opacity: 0.85;
+}
+
+/* Inputs */
+.cosmos-input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(0,0,0,0.45);
+  color: #fff;
+  font-size: 15px;
+  outline: none;
+}
+
+.cosmos-input::placeholder {
+  color: rgba(255,255,255,0.45);
+}
+
+.cosmos-input:focus {
+  border-color: rgba(170, 140, 255, 0.65);
+  box-shadow: 0 0 0 2px rgba(170, 140, 255, 0.15);
+}
+
+/* Buttons */
+.cosmos-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.cosmos-btn {
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.05s ease;
+}
+
+.cosmos-btn:hover {
+  background: rgba(255,255,255,0.14);
+}
+
+.cosmos-btn:active {
+  transform: translateY(1px);
+}
+
+.cosmos-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Variants */
+.cosmos-btn.ghost {
+  background: transparent;
+}
+
+.cosmos-btn.primary {
+  background: linear-gradient(
+    180deg,
+    rgba(150, 115, 255, 0.35),
+    rgba(120, 85, 235, 0.35)
+  );
+  border-color: rgba(150, 115, 255, 0.7);
+}
+
+.cosmos-btn.wide {
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* Result */
+.cosmos-result {
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(0,0,0,0.35);
+  text-align: center;
+}
+
+.cosmos-result .muted {
+  font-size: 11px;
+  opacity: 0.75;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.cosmos-result .big {
+  font-size: 36px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+/* Note */
+.cosmos-note {
+  margin-top: 6px;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+/* Divider */
+.cosmos-hr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,0.15),
+    transparent
+  );
+  margin: 16px 0;
+}
+
+/* Fine print */
+.cosmos-fineprint {
+  margin-top: 12px;
+  font-size: 11px;
+  opacity: 0.7;
+  line-height: 1.4;
+}
