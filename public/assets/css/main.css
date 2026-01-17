@@ -1791,3 +1791,182 @@ body.modal-open #header {
   opacity: 1 !important;
   filter: none !important;
 }
+/* =========================
+   ASK THE COSMOS — DIMENSION MATCH
+   Paste at bottom of assets/css/main.css
+   ========================= */
+
+/* Keep everything scoped so it won't break Dimension */
+#AskCosmos,
+.cosmos {
+  --cos-bg: rgba(18, 18, 24, 0.85);
+  --cos-bg2: rgba(10, 10, 14, 0.75);
+  --cos-border: rgba(255, 255, 255, 0.18);
+  --cos-border2: rgba(255, 255, 255, 0.10);
+  --cos-text: rgba(255, 255, 255, 0.92);
+  --cos-muted: rgba(255, 255, 255, 0.65);
+  --cos-accent: rgba(255, 255, 255, 0.22);
+  --cos-glow: rgba(255, 255, 255, 0.08);
+  --cos-radius: 6px; /* Dimension tends to be squarer than "pill" UIs */
+  --cos-font: "Source Sans Pro", Helvetica, sans-serif;
+}
+
+#AskCosmos .cosmos,
+.cosmos {
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 0;
+  color: var(--cos-text);
+  font-family: var(--cos-font);
+}
+
+/* Title/subtitle to match Dimension headings */
+#AskCosmos .cosmos-title,
+.cosmos .cosmos-title {
+  margin: 0 0 0.75rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+#AskCosmos .cosmos-sub,
+.cosmos .cosmos-sub {
+  margin: 0 0 1.25rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: var(--cos-muted);
+}
+
+/* Card = Dimension panel feel */
+#AskCosmos .cosmos-card,
+.cosmos .cosmos-card {
+  background: linear-gradient(180deg, var(--cos-bg), var(--cos-bg2));
+  border: 1px solid var(--cos-border);
+  border-radius: var(--cos-radius);
+  padding: 1.25rem;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.03) inset,
+    0 1.25rem 2.5rem rgba(0,0,0,0.35);
+  backdrop-filter: blur(6px);
+}
+
+/* Labels like Dimension form labels */
+#AskCosmos .cosmos-label,
+.cosmos .cosmos-label {
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cos-muted);
+}
+
+/* Inputs = match Dimension input style */
+#AskCosmos .cosmos-input,
+.cosmos .cosmos-input {
+  width: 100%;
+  height: 2.75rem;
+  padding: 0 0.9rem;
+  border-radius: var(--cos-radius);
+  border: 1px solid var(--cos-border2);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--cos-text);
+  font-size: 1rem;
+  outline: none;
+}
+
+#AskCosmos .cosmos-input::placeholder,
+.cosmos .cosmos-input::placeholder {
+  color: rgba(255,255,255,0.35);
+}
+
+#AskCosmos .cosmos-input:focus,
+.cosmos .cosmos-input:focus {
+  border-color: var(--cos-border);
+  box-shadow: 0 0 0 2px var(--cos-glow);
+}
+
+/* Buttons = Dimension button style */
+#AskCosmos .cosmos-btn,
+.cosmos .cosmos-btn {
+  height: 2.75rem;
+  padding: 0 1.1rem;
+  border-radius: var(--cos-radius);
+  border: 1px solid var(--cos-border);
+  background: transparent;
+  color: var(--cos-text);
+  font-family: var(--cos-font);
+  font-size: 0.9rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.05s ease;
+}
+
+#AskCosmos .cosmos-btn:hover,
+.cosmos .cosmos-btn:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+#AskCosmos .cosmos-btn:active,
+.cosmos .cosmos-btn:active {
+  transform: translateY(1px);
+}
+
+#AskCosmos .cosmos-btn.primary,
+.cosmos .cosmos-btn.primary {
+  background: rgba(255,255,255,0.10);
+}
+
+#AskCosmos .cosmos-actions,
+.cosmos .cosmos-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+/* Result area */
+#AskCosmos .cosmos-result,
+.cosmos .cosmos-result {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: var(--cos-radius);
+  border: 1px solid var(--cos-border2);
+  background: rgba(255,255,255,0.05);
+  text-align: center;
+}
+
+#AskCosmos .cosmos-result .muted,
+.cosmos .cosmos-result .muted {
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--cos-muted);
+}
+
+#AskCosmos .cosmos-result .big,
+.cosmos .cosmos-result .big {
+  margin-top: 0.35rem;
+  font-size: 2.25rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+/* Divider */
+#AskCosmos .cosmos-hr,
+.cosmos .cosmos-hr {
+  border: none;
+  height: 1px;
+  background: rgba(255,255,255,0.12);
+  margin: 1rem 0;
+}
+
+/* Fine print */
+#AskCosmos .cosmos-fineprint,
+.cosmos .cosmos-fineprint {
+  margin-top: 0.85rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--cos-muted);
+  line-height: 1.5;
+}
