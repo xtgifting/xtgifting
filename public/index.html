@@ -454,7 +454,24 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 			<script src="assets/js/breakpoints.min.js"></script>
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
-		
+		<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("cosmosBtn");
+  const result = document.getElementById("cosmosResult");
+  const valueEl = document.getElementById("cosmosValue");
+  const input = document.getElementById("cosmosAmount");
+
+  if (!btn || !result || !valueEl || !input) return;
+
+  btn.addEventListener("click", () => {
+    const max = Number(input.value) || 25;
+    const suggestion = Math.floor(Math.random() * max) + 1;
+    valueEl.textContent = `$${suggestion}`;
+    result.style.display = "block";
+  });
+});
+</script>
+
 			<!-- Stripe Embedded "pop up" Checkout Modal -->
 			<script src="https://js.stripe.com/v3/"></script>
 			<script>
