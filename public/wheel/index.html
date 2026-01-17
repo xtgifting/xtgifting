@@ -1,37 +1,42 @@
-<script src="https://cdn.jsdelivr.net/npm/howler@2.2.4/dist/howler.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-<script type="module" src="./wheel.js"></script>
-
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Spin the Wheel</title>
+  <title>Support Wheel</title>
   <link rel="stylesheet" href="./wheel.css" />
 </head>
+
 <body>
   <main class="wrap">
     <header class="head">
-      <h1>Spin for an amount</h1>
-      <p>Enter a max. The wheel fills with randomized whole-dollar options from <b>$5</b> to your max.</p>
+      <h1>Send a gift of your choosing</h1>
+      <p>Complete your contribution to unlock a free cosmetic support badge spin.</p>
     </header>
 
     <section class="panel">
       <div class="controls">
+
+        <!-- ✅ New: contribution amount (user chooses amount FIRST) -->
         <label>
-          <span>Maximum amount ($)</span>
-          <input id="maxInput" type="number" min="5" step="1" value="50" />
+          <span>Contribution amount ($)</span>
+          <input id="amountInput" type="number" min="1" step="1" value="25" />
         </label>
 
-        <label>
-          <span>Slices</span>
-          <input id="sliceInput" type="number" min="6" max="24" step="1" value="12" />
-        </label>
-
+        <!-- ✅ New: continue to payment -->
         <div class="row">
-          <button id="regenBtn" class="btn ghost">Regenerate</button>
-          <button id="spinBtn" class="btn">SPIN</button>
+          <button id="payBtn" class="btn">CONTINUE</button>
+        </div>
+
+        <!-- ✅ Locked status -->
+        <div class="result" style="margin-top: 12px;">
+          <div class="muted">Spin status</div>
+          <div id="spinStatus" class="big">Locked — complete contribution to unlock.</div>
+        </div>
+
+        <!-- ✅ Spin button (locked until payment success) -->
+        <div class="row" style="margin-top: 12px;">
+          <button id="spinBtn" class="btn ghost" disabled>SPIN (UNLOCKED AFTER SUPPORT)</button>
         </div>
 
         <div class="result">
@@ -42,8 +47,11 @@
         <div class="chips" id="chips"></div>
 
         <div class="fineprint">
-          Audio plays after you click (browser policy).
+          Cosmetic badge only. No goods/services/content are provided in exchange.
         </div>
+
+        <!-- Optional error line -->
+        <p id="errText" style="margin-top:10px; color:#ff6b6b;"></p>
       </div>
 
       <div class="stage">
@@ -55,10 +63,11 @@
     </section>
   </main>
 
-  <!-- CDN libs for static hosting -->
+  <!-- ✅ CDN libs (include ONCE) -->
   <script src="https://cdn.jsdelivr.net/npm/howler@2.2.4/dist/howler.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
+  <!-- Your wheel logic -->
   <script type="module" src="./wheel.js"></script>
 </body>
 </html>

@@ -1,230 +1,221 @@
-const $ = (id) => document.getElementById(id);
+// wheel.js (type="module")
 
-const canvas = $("wheelCanvas");
-const ctx = canvas.getContext("2d");
+// --------------------------
+// Stripe-friendly outcomes (cosmetic only)
+// --------------------------
+const OUTCOMES = [
+  "Support Badge: Midnight Patron",
+  "Support Badge: Moonlit Ally",
+  "Support Badge: Velvet Favor",
+  "Support Badge: Crimson Thanks",
+  "Message: “Well done — appreciated.”",
+  "Message: “Noted with gratitude.”",
+  "Message: “A graceful show of support.”",
+  "Message: “Thank you.”",
+  "Message: “You’re the best — thank you.”",
+  "Support Badge: Royal Acknowledgment",
+  "Support Badge: Dark Muse Supporter",
+  "Message: “Your support is felt.”"
+];
 
-const maxInput = $("maxInput");
-const sliceInput = $("sliceInput");
-const spinBtn = $("spinBtn");
-const regenBtn = $("regenBtn");
-const resultText = $("resultText");
-const chips = $("chips");
+// --------------------------
+// DOM
+// --------------------------
+const canvas = document.getElementById("wheelCanvas");
+const ctx = canvas?.getContext("2d");
 
-let values = [];
-let spinning = false;
+const amountInput = document.getElementById("amountInput");
+const payBtn = document.getElementById("payBtn");
+const spinBtn = document.getElementById("spinBtn");
+const resultText = document.getElementById("resultText");
+const spinStatus = document.getElementById("spinStatus");
+const chips = document.getElementById("chips");
+const errText = document.getElementById("errText");
 
-let rotation = 0; // radians
-let raf = null;
-
-// --- audio (CDN howler) ---
-const sounds = {
-  spinLoop: new Howl({
-    src: ["https://cdn.jsdelivr.net/gh/sfxhub/ui-sounds@main/spin-loop.mp3"],
-    loop: true,
-    volume: 0.22
-  }),
-  tick: new Howl({
-    src: ["https://cdn.jsdelivr.net/gh/sfxhub/ui-sounds@main/tick.mp3"],
-    volume: 0.20
-  }),
-  win: new Howl({
-    src: ["https://cdn.jsdelivr.net/gh/sfxhub/ui-sounds@main/win.mp3"],
-    volume: 0.50
-  })
-};
-
-// If you don't have local audio files yet, comment the above and use CDN mp3s,
-// or add files under: /wheel/audio/*.mp3
-
-function clampInt(val, min, max) {
-  const n = Math.floor(Number(val));
-  if (Number.isNaN(n)) return min;
-  return Math.max(min, Math.min(max, n));
+if (!canvas || !ctx || !amountInput || !payBtn || !spinBtn || !resultText || !spinStatus || !chips) {
+  console.error("Missing wheel elements.");
 }
 
-function randInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+// --------------------------
+// State
+// --------------------------
+let unlocked = false;
+let spunThisUnlock = false;
+let currentRotation = 0;
+
+// Optional sounds (safe – no “cash” cues)
+const tickSound = (window.Howl)
+  ? new Howl({ src: ["./tick.mp3"], volume: 0.25 })
+  : null;
+
+function setLockedUI() {
+  unlocked = false;
+  spunThisUnlock = false;
+  spinBtn.disabled = true;
+  spinBtn.classList.add("ghost");
+  spinStatus.textContent = "Locked — complete contribution to unlock.";
 }
 
-function makeValues() {
-  const max = clampInt(maxInput.value, 5, 100000);
-  const n = clampInt(sliceInput.value, 6, 24);
-  maxInput.value = String(max);
-  sliceInput.value = String(n);
-
-  values = Array.from({ length: n }, () => randInt(5, max));
-  resultText.textContent = "—";
-  renderChips();
-  draw();
+function setUnlockedUI() {
+  unlocked = true;
+  spunThisUnlock = false;
+  spinBtn.disabled = false;
+  spinBtn.classList.remove("ghost");
+  spinStatus.textContent = "Unlocked — you may spin once for a cosmetic badge.";
 }
 
+// Expose a function you can call after Stripe success
+window.unlockSpin = () => setUnlockedUI();
+
+// Start locked
+setLockedUI();
+
+// --------------------------
+// Render chips (shows possible outcomes)
+// --------------------------
 function renderChips() {
   chips.innerHTML = "";
-  for (const v of values) {
-    const s = document.createElement("span");
-    s.textContent = `$${v}`;
-    chips.appendChild(s);
-  }
+  OUTCOMES.forEach((o) => {
+    const el = document.createElement("span");
+    el.className = "chip";
+    el.textContent = o.replace("Support Badge: ", "").replace("Message: ", "");
+    chips.appendChild(el);
+  });
 }
+renderChips();
 
-function draw() {
-  // crisp on hi-dpi
-  const dpr = window.devicePixelRatio || 1;
-  const cssSize = 520;
-  canvas.style.width = cssSize + "px";
-  canvas.style.height = cssSize + "px";
-  canvas.width = Math.floor(cssSize * dpr);
-  canvas.height = Math.floor(cssSize * dpr);
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+// --------------------------
+// Wheel drawing (simple but clean)
+// --------------------------
+function drawWheel(rotationRad = 0) {
+  const W = canvas.width;
+  const H = canvas.height;
+  const cx = W / 2;
+  const cy = H / 2;
+  const radius = Math.min(cx, cy) - 10;
 
-  ctx.clearRect(0, 0, cssSize, cssSize);
+  ctx.clearRect(0, 0, W, H);
 
-  const cx = cssSize / 2;
-  const cy = cssSize / 2;
-  const radius = cssSize * 0.42;
-  const n = values.length || 1;
-  const step = (Math.PI * 2) / n;
+  const n = OUTCOMES.length;
+  const slice = (Math.PI * 2) / n;
 
-  // subtle glow
-  ctx.beginPath();
-  ctx.arc(cx, cy, radius + 18, 0, Math.PI * 2);
-  ctx.fillStyle = "rgba(255,255,255,0.04)";
-  ctx.fill();
-
-  // segments
   for (let i = 0; i < n; i++) {
-    const start = rotation + i * step;
-    const end = start + step;
+    const start = rotationRad + i * slice;
+    const end = start + slice;
 
+    // alternating dark slices
     ctx.beginPath();
     ctx.moveTo(cx, cy);
     ctx.arc(cx, cy, radius, start, end);
     ctx.closePath();
-    ctx.fillStyle = i % 2 === 0 ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.10)";
+    ctx.fillStyle = i % 2 === 0 ? "#1f1f1f" : "#2a2a2a";
     ctx.fill();
 
-    ctx.strokeStyle = "rgba(255,255,255,0.10)";
+    // slice border
+    ctx.strokeStyle = "rgba(255,255,255,0.18)";
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    // label
-    const mid = (start + end) / 2;
-    const label = `$${values[i]}`;
+    // label (short)
+    const label = OUTCOMES[i]
+      .replace("Support Badge: ", "")
+      .replace("Message: ", "");
+
     ctx.save();
     ctx.translate(cx, cy);
-    ctx.rotate(mid);
+    ctx.rotate(start + slice / 2);
     ctx.textAlign = "right";
-    ctx.textBaseline = "middle";
-    ctx.fillStyle = "rgba(255,255,255,0.92)";
-    ctx.font = "700 20px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto";
-    ctx.fillText(label, radius - 16, 0);
+    ctx.fillStyle = "rgba(255,255,255,0.9)";
+    ctx.font = "14px sans-serif";
+    ctx.fillText(label.length > 18 ? label.slice(0, 18) + "…" : label, radius - 16, 6);
     ctx.restore();
   }
 
-  // hub
+  // center cap
   ctx.beginPath();
-  ctx.arc(cx, cy, 54, 0, Math.PI * 2);
-  ctx.fillStyle = "rgba(0,0,0,0.55)";
+  ctx.arc(cx, cy, 32, 0, Math.PI * 2);
+  ctx.fillStyle = "#111";
   ctx.fill();
   ctx.strokeStyle = "rgba(255,255,255,0.18)";
   ctx.lineWidth = 2;
   ctx.stroke();
 }
+drawWheel(currentRotation);
 
-function easeOutCubic(t) {
-  return 1 - Math.pow(1 - t, 3);
-}
+// --------------------------
+// Payment button (placeholder)
+// --------------------------
+payBtn.addEventListener("click", async () => {
+  if (errText) errText.textContent = "";
 
-function stopAllAudio() {
-  try { sounds.spinLoop.stop(); } catch {}
-}
+  const amount = Number(amountInput.value);
+  if (!amount || amount < 1) {
+    if (errText) errText.textContent = "Please enter a valid amount.";
+    return;
+  }
 
-function confettiWin() {
-  const burst = (ratio, opts) =>
-    confetti({
-      ...opts,
-      origin: { y: 0.55 },
-      particleCount: Math.floor(240 * ratio),
-    });
+  // ✅ This is where you trigger Stripe checkout
+  // - If you’re using Vercel backend: call /api/create-checkout-session
+  // - After Stripe returns success: call window.unlockSpin()
 
-  burst(0.35, { spread: 28, startVelocity: 52 });
-  burst(0.25, { spread: 70 });
-  burst(0.20, { spread: 110, decay: 0.92, scalar: 0.95 });
-  burst(0.20, { spread: 140, startVelocity: 35, decay: 0.94, scalar: 1.1 });
-}
+  // TEMP DEV SHORTCUT (so you can test the spin flow right now):
+  // Remove this once Stripe success is wired.
+  setUnlockedUI();
+});
 
-function spin() {
-  if (spinning || values.length < 2) return;
-  spinning = true;
+// --------------------------
+// Spin logic (one spin per unlock)
+// --------------------------
+spinBtn.addEventListener("click", () => {
+  if (!unlocked || spunThisUnlock) return;
+
+  spunThisUnlock = true;
   spinBtn.disabled = true;
-  regenBtn.disabled = true;
 
-  // user gesture: safe to start audio
-  stopAllAudio();
-  try { sounds.spinLoop.play(); } catch {}
+  // Choose outcome
+  const n = OUTCOMES.length;
+  const index = Math.floor(Math.random() * n);
+  const result = OUTCOMES[index];
 
-  const n = values.length;
-  const step = (Math.PI * 2) / n;
+  // Spin math: land selected slice at pointer (top)
+  const slice = (Math.PI * 2) / n;
+  const target = (Math.PI * 1.5) - (index * slice + slice / 2); // pointer at top
+  const extraSpins = 5 * Math.PI * 2;
 
-  // pick winner slice
-  const winnerIndex = Math.floor(Math.random() * n);
-  const winnerValue = values[winnerIndex];
+  const startRot = currentRotation;
+  const endRot = target + extraSpins;
 
-  // pointer is at top (-90deg)
-  const pointer = -Math.PI / 2;
+  const startTime = performance.now();
+  const duration = 2200;
 
-  // want: rotation + (winnerIndex+0.5)*step == pointer (mod 2π)
-  let target = pointer - (winnerIndex + 0.5) * step;
+  function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
 
-  // add extra spins
-  target += randInt(6, 9) * Math.PI * 2;
+  function anim(now) {
+    const t = Math.min(1, (now - startTime) / duration);
+    const eased = easeOutCubic(t);
+    currentRotation = startRot + (endRot - startRot) * eased;
 
-  const startRot = rotation;
-  const delta = target - (startRot % (Math.PI * 2));
-  const duration = randInt(4200, 5600);
-  const start = performance.now();
+    drawWheel(currentRotation);
 
-  let lastTick = Math.floor(rotation / step);
-
-  const anim = (now) => {
-    const t = Math.min(1, (now - start) / duration);
-    const e = easeOutCubic(t);
-    rotation = startRot + delta * e;
-
-    // tick when crossing boundaries (optional)
-    const tickMark = Math.floor(rotation / step);
-    if (tickMark !== lastTick && t < 0.98) {
-      lastTick = tickMark;
-      try { sounds.tick.play(); } catch {}
+    // Optional ticking — only if you have tick.mp3 present
+    if (tickSound && t < 0.98) {
+      // very light tick, not tied to money
+      if (Math.random() < 0.08) tickSound.play();
     }
 
-    draw();
+    if (t < 1) requestAnimationFrame(anim);
+    else {
+      // finish
+      resultText.textContent = result;
 
-    if (t < 1) {
-      raf = requestAnimationFrame(anim);
-    } else {
-      stopAllAudio();
-      try { sounds.win.play(); } catch {}
-      resultText.textContent = `$${winnerValue}`;
-      confettiWin();
+      if (window.confetti) {
+        confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
+      }
 
-      spinning = false;
-      spinBtn.disabled = false;
-      regenBtn.disabled = false;
+      spinStatus.textContent = "Spin used. (Cosmetic result only.)";
+      unlocked = false; // relock until next contribution
     }
-  };
+  }
 
-  cancelAnimationFrame(raf);
-  raf = requestAnimationFrame(anim);
-}
-
-// events
-spinBtn.addEventListener("click", spin);
-regenBtn.addEventListener("click", makeValues);
-maxInput.addEventListener("change", makeValues);
-sliceInput.addEventListener("change", makeValues);
-canvas.addEventListener("click", spin);
-
-// init
-makeValues();
-window.addEventListener("resize", draw);
+  requestAnimationFrame(anim);
+});
