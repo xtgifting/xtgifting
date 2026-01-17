@@ -1,0 +1,193 @@
+<!-- Ask the Cosmos (Stripe-friendly): random “suggested tip”, user chooses final amount -->
+<!-- Drop this anywhere in your HTML where you want the game to appear. -->
+
+<section id="cosmos" class="cosmos">
+  <h2 class="cosmos-title">Ask the Cosmos</h2>
+  <p class="cosmos-sub">
+    The Cosmos can suggest an amount — you’re always in control of what you actually send.
+  </p>
+
+  <div class="cosmos-card">
+    <div class="cosmos-row">
+      <label class="cosmos-label" for="cosmosMax">Max suggestion ($)</label>
+      <input id="cosmosMax" class="cosmos-input" type="number" min="1" step="1" value="50" />
+    </div>
+
+    <div class="cosmos-actions">
+      <button id="cosmosAsk" class="cosmos-btn">Ask the Cosmos</button>
+      <button id="cosmosReset" class="cosmos-btn ghost" type="button">Reset</button>
+    </div>
+
+    <div class="cosmos-result" aria-live="polite">
+      <div class="muted">Suggestion</div>
+      <div id="cosmosSuggestion" class="big">—</div>
+      <div id="cosmosNote" class="cosmos-note"></div>
+    </div>
+
+    <hr class="cosmos-hr" />
+
+    <div class="cosmos-row">
+      <label class="cosmos-label" for="cosmosAmount">Your gift amount ($)</label>
+      <input
+        id="cosmosAmount"
+        class="cosmos-input"
+        type="number"
+        min="1"
+        step="1"
+        placeholder="Enter what you want to send"
+      />
+    </div>
+
+    <button id="cosmosUseSuggested" class="cosmos-btn wide" type="button" disabled>
+      Use suggested amount
+    </button>
+
+    <!-- OPTIONAL: connect this to your existing Stripe modal / checkout flow.
+         Replace openCheckoutWithAmount(...) with your own function. -->
+    <button id="cosmosContinue" class="cosmos-btn wide primary" type="button" disabled>
+      Continue to payment
+    </button>
+
+    <p class="cosmos-fineprint">
+      This is a visual suggestion tool only. No outcome is guaranteed, and no purchase is required to “ask.”
+    </p>
+  </div>
+</section>
+
+<style>
+  /* Minimal dark theme styling (safe to paste into your CSS) */
+  .cosmos { max-width: 720px; margin: 0 auto; padding: 24px 16px; }
+  .cosmos-title { margin: 0 0 8px; font-size: 28px; letter-spacing: 0.5px; }
+  .cosmos-sub { margin: 0 0 18px; opacity: 0.85; }
+  .cosmos-card {
+    background: rgba(20, 20, 24, 0.9);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    backdrop-filter: blur(6px);
+  }
+  .cosmos-row { display: grid; grid-template-columns: 1fr; gap: 8px; margin: 12px 0; }
+  .cosmos-label { font-size: 13px; opacity: 0.9; }
+  .cosmos-input {
+    width: 100%;
+    padding: 12px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.16);
+    background: rgba(0,0,0,0.35);
+    color: #fff;
+    outline: none;
+  }
+  .cosmos-input:focus { border-color: rgba(255,255,255,0.34); }
+  .cosmos-actions { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+  .cosmos-btn {
+    padding: 10px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.16);
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    cursor: pointer;
+  }
+  .cosmos-btn:hover { background: rgba(255,255,255,0.12); }
+  .cosmos-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .cosmos-btn.ghost { background: transparent; }
+  .cosmos-btn.wide { width: 100%; margin-top: 10px; }
+  .cosmos-btn.primary { background: rgba(130, 92, 255, 0.28); border-color: rgba(130, 92, 255, 0.55); }
+  .cosmos-result { margin-top: 14px; padding: 12px; border-radius: 14px; background: rgba(0,0,0,0.25); }
+  .muted { font-size: 12px; opacity: 0.8; }
+  .big { font-size: 34px; font-weight: 700; margin-top: 4px; }
+  .cosmos-note { margin-top: 6px; font-size: 13px; opacity: 0.9; }
+  .cosmos-hr { border: none; border-top: 1px solid rgba(255,255,255,0.10); margin: 14px 0; }
+  .cosmos-fineprint { margin: 12px 0 0; font-size: 12px; opacity: 0.75; }
+</style>
+
+<script>
+  // Ask the Cosmos: random suggested amount
+  // Stripe-friendly behavior: suggestion is not forced; user can override.
+  (function () {
+    const maxEl = document.getElementById("cosmosMax");
+    const askBtn = document.getElementById("cosmosAsk");
+    const resetBtn = document.getElementById("cosmosReset");
+    const suggestionEl = document.getElementById("cosmosSuggestion");
+    const noteEl = document.getElementById("cosmosNote");
+
+    const amountEl = document.getElementById("cosmosAmount");
+    const useSuggestedBtn = document.getElementById("cosmosUseSuggested");
+    const continueBtn = document.getElementById("cosmosContinue");
+
+    let lastSuggestion = null;
+
+    // Weighted-ish suggestions (more likely smaller numbers)
+    function pickSuggestion(max) {
+      const m = Math.max(1, Math.floor(max));
+      // Create a skew towards lower values using squared random
+      const r = Math.random();
+      const skew = r * r; // 0..1, biased low
+      const val = Math.max(1, Math.round(skew * m));
+      return val;
+    }
+
+    function setContinueEnabled() {
+      const amt = Number(amountEl.value);
+      const ok = Number.isFinite(amt) && amt >= 1;
+      continueBtn.disabled = !ok;
+    }
+
+    askBtn.addEventListener("click", () => {
+      const max = Number(maxEl.value);
+      if (!max || max < 1) {
+        suggestionEl.textContent = "—";
+        noteEl.textContent = "Please set a valid max suggestion.";
+        useSuggestedBtn.disabled = true;
+        lastSuggestion = null;
+        return;
+      }
+
+      lastSuggestion = pickSuggestion(max);
+      suggestionEl.textContent = `$${lastSuggestion}`;
+      noteEl.textContent = "Suggestion only — you choose your final amount.";
+      useSuggestedBtn.disabled = false;
+
+      // Don’t auto-fill the amount (keeps it clearly user-controlled).
+      // But you can choose to auto-fill by uncommenting:
+      // amountEl.value = String(lastSuggestion);
+      // setContinueEnabled();
+    });
+
+    useSuggestedBtn.addEventListener("click", () => {
+      if (lastSuggestion == null) return;
+      amountEl.value = String(lastSuggestion);
+      setContinueEnabled();
+      noteEl.textContent = "You can still change the amount before continuing.";
+    });
+
+    amountEl.addEventListener("input", setContinueEnabled);
+
+    resetBtn.addEventListener("click", () => {
+      lastSuggestion = null;
+      suggestionEl.textContent = "—";
+      noteEl.textContent = "";
+      amountEl.value = "";
+      useSuggestedBtn.disabled = true;
+      continueBtn.disabled = true;
+    });
+
+    continueBtn.addEventListener("click", () => {
+      const amt = Number(amountEl.value);
+      if (!amt || amt < 1) return;
+
+      // === CONNECT TO YOUR CHECKOUT FLOW ===
+      // Option A: If you already have a function to open your Stripe modal and set amount:
+      // openCheckoutWithAmount(amt);
+
+      // Option B: Or just emit an event your existing code can listen for:
+      window.dispatchEvent(new CustomEvent("cosmos:continue", { detail: { amount: amt } }));
+
+      // For now, show a simple confirmation in the UI:
+      noteEl.textContent = `Ready to continue with $${amt}.`;
+    });
+
+    // If you want: listen to the event elsewhere like:
+    // window.addEventListener("cosmos:continue", (e) => console.log(e.detail.amount));
+  })();
+</script>
